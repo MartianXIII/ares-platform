@@ -1,0 +1,131 @@
+services:
+  fleet-manager:
+    build:
+      context: ./services/fleet-manager
+    container_name: ares-fleet-manager
+    ports:
+      - "8001:8000"
+    environment:
+      SERVICE_NAME: fleet-manager
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ares-net
+
+  telemetry-service:
+    build:
+      context: ./services/telemetry-service
+    container_name: ares-telemetry-service
+    ports:
+      - "8002:8000"
+    environment:
+      SERVICE_NAME: telemetry-service
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ares-net
+
+  mission-service:
+    build:
+      context: ./services/mission-service
+    container_name: ares-mission-service
+    ports:
+      - "8003:8000"
+    environment:
+      SERVICE_NAME: mission-service
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ares-net
+
+  edge-agent-alpha:
+    build:
+      context: ./edge-agent
+    container_name: ares-edge-agent-alpha
+    environment:
+      EDGE_NODE_ID: edge-node-alpha
+      EDGE_SITE: AUSTIN-LAB
+      FLEET_MANAGER_URL: http://fleet-manager:8000
+      TELEMETRY_SERVICE_URL: http://telemetry-service:8000
+    depends_on:
+      - fleet-manager
+      - telemetry-service
+    networks:
+      - ares-net
+
+  edge-agent-bravo:
+    build:
+      context: ./edge-agent
+    container_name: ares-edge-agent-bravo
+    environment:
+      EDGE_NODE_ID: edge-node-bravo
+      EDGE_SITE: FIELD-SIM-BRAVO
+      FLEET_MANAGER_URL: http://fleet-manager:8000
+      TELEMETRY_SERVICE_URL: http://telemetry-service:8000
+    depends_on:
+      - fleet-manager
+      - telemetry-service
+    networks:
+      - ares-net
+
+  postgres:
+    image: postgres:16
+    container_name: ares-postgres
+    environment:
+      POSTGRES_USER: ares
+      POSTGRES_PASSWORD: ares_dev_password
+      POSTGRES_DB: ares
+    ports:
+      - "5432:5432"
+    volumes:
+      - ares-postgres-data:/var/lib/postgresql/data
+    networks:
+      - ares-net
+
+  redis:
+    image: redis:7
+    container_name: ares-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ares-net
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: ares-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - fleet-manager
+      - telemetry-service
+      - mission-service
+    networks:
+      - ares-net
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: ares-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on:
+      - prometheus
+    networks:
+      - ares-net
+    volumes:
+      - ares-grafana-data:/var/lib/grafana
+
+networks:
+  ares-net:
+    driver: bridge
+
+volumes:
+  ares-postgres-data:
+  ares-grafana-data:
