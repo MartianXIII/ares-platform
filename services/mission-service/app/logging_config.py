@@ -1,6 +1,8 @@
 import logging
 import sys
+
 from pythonjsonlogger import jsonlogger
+
 
 def configure_logging() -> None:
     logger = logging.getLogger()

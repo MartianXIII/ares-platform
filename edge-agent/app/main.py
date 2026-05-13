@@ -4,7 +4,6 @@ import random
 import time
 
 import requests
-
 from logging_config import configure_logging
 
 configure_logging()

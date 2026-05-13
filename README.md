@@ -1,3 +1,7 @@
+![CI](https://github.com/Martianxiii/ares-platform/actions/workflows/ci.yml/badge.svg)
+![Security](https://github.com/Martianxiii/ares-platform/actions/workflows/security.yml/badge.svg)
+![Container Build](https://github.com/Martianxiii/ares-platform/actions/workflows/container-build.yml/badge.svg)
+
 # ARES Platform
 
 ARES Platform is a miniature autonomous systems deployment platform designed to demonstrate senior platform engineering skills across cloud, on-prem, and edge environments.
