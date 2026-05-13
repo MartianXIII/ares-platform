@@ -1,6 +1,5 @@
 import logging
-from datetime import datetime, timezone
-from typing import Dict
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from fastapi import APIRouter
@@ -25,7 +24,7 @@ class MissionRecord(MissionCreate):
     created_at: str
 
 
-MISSIONS: Dict[str, MissionRecord] = {}
+MISSIONS: dict[str, MissionRecord] = {}
 
 
 @router.post("", response_model=MissionRecord)
@@ -34,7 +33,7 @@ def create_mission(payload: MissionCreate) -> MissionRecord:
         **payload.model_dump(),
         mission_id=str(uuid4()),
         status="created",
-        created_at=datetime.now(timezone.utc).isoformat(),
+        created_at=datetime.now(UTC).isoformat(),
     )
 
     MISSIONS[mission.mission_id] = mission

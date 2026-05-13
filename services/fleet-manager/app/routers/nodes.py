@@ -1,6 +1,5 @@
 import logging
-from datetime import datetime, timezone
-from typing import Dict
+from datetime import UTC, datetime
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -24,14 +23,14 @@ class EdgeNodeRecord(EdgeNodeRegistration):
     status: str = "online"
 
 
-NODES: Dict[str, EdgeNodeRecord] = {}
+NODES: dict[str, EdgeNodeRecord] = {}
 
 
 @router.post("/register", response_model=EdgeNodeRecord)
 def register_node(payload: EdgeNodeRegistration) -> EdgeNodeRecord:
     record = EdgeNodeRecord(
         **payload.model_dump(),
-        registered_at=datetime.now(timezone.utc).isoformat(),
+        registered_at=datetime.now(UTC).isoformat(),
         status="online",
     )
 

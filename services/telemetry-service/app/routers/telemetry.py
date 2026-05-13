@@ -1,6 +1,5 @@
 import logging
-from datetime import datetime, timezone
-from typing import Dict, List
+from datetime import UTC, datetime
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -21,13 +20,13 @@ class TelemetryEvent(BaseModel):
     timestamp: str | None = None
 
 
-TELEMETRY_EVENTS: Dict[str, List[TelemetryEvent]] = {}
+TELEMETRY_EVENTS: dict[str, list[TelemetryEvent]] = {}
 
 
 @router.post("")
 def ingest_telemetry(payload: TelemetryEvent) -> dict:
     if payload.timestamp is None:
-        payload.timestamp = datetime.now(timezone.utc).isoformat()
+        payload.timestamp = datetime.now(UTC).isoformat()
 
     TELEMETRY_EVENTS.setdefault(payload.node_id, []).append(payload)
 
